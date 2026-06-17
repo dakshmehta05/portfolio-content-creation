@@ -55,9 +55,9 @@ export default function App() {
       tagline: 'A visual exploration of tea culture, capturing organic motion and sensory details.',
       cover: '/assets/hero-frames/ezgif-frame-100.jpg',
       videoUrl: '/assets/videos/tea.mp4',
-      role: 'Creative Director & Filmmaker',
-      tools: 'DaVinci Resolve, Premiere Pro, Sony FX3',
-      process: 'Captured macro textures, liquid physics, and steam dynamics. The color grading was meticulously calibrated to deliver rich organic tones, creating a sensory advertising experience.',
+      role: 'Concept, Direction & Cinematography',
+      tools: 'Vivo V50, Wondershare Filmora, VN Editor',
+      process: 'Captured macro textures, liquid physics, and steam dynamics using Vivo V50. The concept, direction, and color grading were completely customized to deliver rich organic tones, creating a sensory advertising experience.',
       output: 'Cinematic commercial broadcasted digitally.'
     },
     {
@@ -79,9 +79,9 @@ export default function App() {
       tagline: 'High-contrast product locks emphasizing mechanical strength and security structures.',
       cover: '/assets/hero-frames/ezgif-frame-220.jpg',
       videoUrl: '/assets/videos/strict-1.mp4',
-      role: 'Filmmaker & Editor',
-      tools: 'DaVinci Resolve, After Effects',
-      process: 'Designed a high-impact trailer demonstrating physical and digital security lock concepts. Synchronized mechanical clicks and sound effects for auditory feedback.',
+      role: 'Concept, Direction & Cinematography',
+      tools: 'Vivo V50, Wondershare Filmora, VN Editor',
+      process: 'Designed and shot a high-impact trailer demonstrating lock security concepts. Synchronized custom mechanical clicks and editing speed to matching audio beats.',
       output: 'Product launching advertisement.'
     },
     {
@@ -91,9 +91,9 @@ export default function App() {
       tagline: 'Second sequence in the industrial security series, highlighting metal compositions.',
       cover: '/assets/hero-frames/ezgif-frame-260.jpg',
       videoUrl: '/assets/videos/strict-2.mp4',
-      role: 'Filmmaker & Colorist',
-      tools: 'DaVinci Resolve, Premiere Pro',
-      process: 'Explored cold, industrial metallic aesthetics. Created a futuristic dark laboratory environment to frame high-end commercial locking designs.',
+      role: 'Concept, Direction & Cinematography',
+      tools: 'Vivo V50, Wondershare Filmora, VN Editor',
+      process: 'Explored cold, industrial metallic aesthetics. Created a futuristic dark laboratory look using custom direction, mobile lensing, and specialized mobile color grading.',
       output: 'B2B advertising reel.'
     },
     {
@@ -103,9 +103,9 @@ export default function App() {
       tagline: 'High-speed cinematic sequences examining precision industrial design.',
       cover: '/assets/hero-frames/ezgif-frame-050.jpg',
       videoUrl: '/assets/videos/critical-1.mp4',
-      role: 'Filmmaker',
-      tools: 'Premiere Pro, Sony FX3',
-      process: 'Recorded high-speed sequences of steel locking mechanisms. The editorial pace emphasizes tension, rigidity, and modern heavy-metal engineering.',
+      role: 'Concept, Direction & Cinematography',
+      tools: 'Vivo V50, Wondershare Filmora, VN Editor',
+      process: 'Recorded high-speed sequences of steel locking mechanisms. Concept and editorial pace emphasizes tension, rigidity, and modern heavy-metal engineering using mobile shooting rigs.',
       output: 'Commercial advertising collateral.'
     },
     {
@@ -115,9 +115,9 @@ export default function App() {
       tagline: 'Generative biotechnology advertisement showcasing futuristic organic structures.',
       cover: '/assets/hero-frames/ezgif-frame-140.jpg',
       videoUrl: '/assets/videos/ai-ad-1.mp4',
-      role: 'AI Creator & Director',
-      tools: 'Midjourney, Runway Gen-2, Luma Dream Machine',
-      process: 'Developed advanced textual prompts to synthesize bio-chrome mechanical orchids. Generated multiple frame interpolations and processed using neural upscaling tools.',
+      role: 'AI Creator & Editor',
+      tools: 'Google Flow, Gemini, ChatGPT, ElevenLabs AI',
+      process: 'Developed advanced generative pipelines to synthesize bio-chrome mechanical structures. Orchestrated text-to-video prompt engineering with custom direction and script overlays.',
       prompt: 'hyper-realistic cinematic close-up of bioluminescent orchid blooming inside a futuristic chrome lab, neon teal accents, 8k resolution, raytracing --ar 16:9',
       output: 'Future-facing AI advertising concept.'
     },
@@ -129,8 +129,8 @@ export default function App() {
       cover: '/assets/hero-frames/ezgif-frame-180.jpg',
       videoUrl: '/assets/videos/ai-ad-2.mp4',
       role: 'AI Creator & Sound Designer',
-      tools: 'Stable Diffusion, Runway Gen-2, ElevenLabs',
-      process: 'Simulated a high-speed sports car driving through wet cyberpunk streets. Created prompt paths for heavy rain, neon reflections, and camera pans.',
+      tools: 'Google Flow, Gemini, ChatGPT, ElevenLabs AI',
+      process: 'Simulated a high-speed sports car driving through wet cyberpunk streets using generative loops and neural audio synthesis.',
       prompt: 'sleek sports car cruising through dark wet neon-lit Tokyo streets, cinematic lighting, heavy rain reflections, A24 aesthetic, photorealistic --ar 16:9',
       output: 'AI campaign reel.'
     }
@@ -790,6 +790,60 @@ export default function App() {
               <a href="#contact" className="btn-luxury" style={{ alignSelf: 'flex-start' }}>
                 Start a Campaign <ArrowRight size={18} />
               </a>
+            </div>
+          </div>
+
+          {/* ==========================================
+              creative toolkit section
+              ========================================== */}
+          <div className="toolkit-section">
+            <div className="section-header" style={{ marginBottom: '3rem', marginTop: '2rem' }}>
+              <span className="section-label">My Creative Stack</span>
+              <h3 className="section-title">THE TOOLKIT</h3>
+            </div>
+            <div className="toolkit-grid">
+              <div className="toolkit-card">
+                <div className="toolkit-icon-wrapper">
+                  <Smartphone size={24} className="toolkit-icon" />
+                </div>
+                <h4 className="toolkit-card-title">Cinematography &amp; Shoot</h4>
+                <div className="toolkit-card-value">Vivo V50</div>
+                <p className="toolkit-card-desc">Used for high-resolution videography and mobile-based cinematic shoots.</p>
+              </div>
+
+              <div className="toolkit-card">
+                <div className="toolkit-icon-wrapper">
+                  <Video size={24} className="toolkit-icon" />
+                </div>
+                <h4 className="toolkit-card-title">Video Editing &amp; Grading</h4>
+                <div className="toolkit-card-value">Wondershare Filmora &amp; VN Editor</div>
+                <p className="toolkit-card-desc">Advanced timeline assembly, pacing edits, sound design, and color grading.</p>
+              </div>
+
+              <div className="toolkit-card">
+                <div className="toolkit-icon-wrapper">
+                  <Monitor size={24} className="toolkit-icon" />
+                </div>
+                <h4 className="toolkit-card-title">Poster &amp; Graphic Design</h4>
+                <div className="toolkit-card-value">Canva &amp; Pinterest</div>
+                <p className="toolkit-card-desc">Visual layout research, typography styling, moodboarding, and advertisement design.</p>
+              </div>
+
+              <div className="toolkit-card">
+                <div className="toolkit-icon-wrapper">
+                  <Sparkles size={24} className="toolkit-icon" />
+                </div>
+                <h4 className="toolkit-card-title">AI Advertising &amp; Pipelines</h4>
+                <div className="toolkit-card-value">Google Flow, Gemini, ChatGPT, ElevenLabs AI</div>
+                <p className="toolkit-card-desc">Generative media generation, scriptwriting, voice cloning, and neural editing pipelines.</p>
+              </div>
+            </div>
+            
+            <div className="toolkit-philosophy-card">
+              <h4 className="toolkit-philosophy-title">DIRECTION &amp; CONCEPTUALIZATION</h4>
+              <p className="toolkit-philosophy-text">
+                Every single visual project is conceptualized from scratch. I direct, storyboard, script, and design the creative foundation entirely using my own ideas and direction.
+              </p>
             </div>
           </div>
 

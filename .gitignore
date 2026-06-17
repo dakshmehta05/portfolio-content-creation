@@ -25,5 +25,4 @@ dist-ssr
 
 # Large media assets (>100MB) blocked by GitHub limits
 public/assets/videos/perfume.mov
-public/assets/videos/tea.mp4
 
