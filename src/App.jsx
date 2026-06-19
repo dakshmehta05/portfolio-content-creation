@@ -3,18 +3,10 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { 
-  Play, 
-  Pause, 
   X, 
   ArrowRight, 
   Download, 
   FileText, 
-  Mail, 
-  Instagram, 
-  Linkedin, 
-  Github,
-  Maximize2,
-  ChevronRight,
   Sparkles,
   Smartphone,
   Video,
@@ -43,6 +35,12 @@ export default function App() {
   const heroContainerRef = useRef(null);
   const imagesRef = useRef([]);
   const currentFrameRef = useRef(1);
+
+  // Refs for About Creator Scroll elements
+  const aboutCanvasRef = useRef(null);
+  const aboutContainerRef = useRef(null);
+  const aboutImagesRef = useRef([]);
+  const aboutCurrentFrameRef = useRef(1);
 
   // ------------------------------------------------------------------------
   // PROJECT DATASET
@@ -170,7 +168,8 @@ export default function App() {
   useEffect(() => {
     let isMounted = true;
     let loadedCount = 0;
-    const totalFrames = 300;
+    const totalHeroFrames = 300;
+    const totalAboutFrames = 241;
     
     // List of static images to preload besides frames
     const otherAssets = [
@@ -178,8 +177,9 @@ export default function App() {
       '/assets/images/jewellery-ad.png',
     ];
     
-    const totalAssets = totalFrames + otherAssets.length;
-    const loadedImages = [];
+    const totalAssets = totalHeroFrames + totalAboutFrames + otherAssets.length;
+    const loadedHeroImages = [];
+    const loadedAboutImages = [];
 
     const handleAssetLoad = () => {
       loadedCount++;
@@ -194,18 +194,31 @@ export default function App() {
     };
 
     // Preload hero frames
-    for (let i = 1; i <= totalFrames; i++) {
+    for (let i = 1; i <= totalHeroFrames; i++) {
       const img = new Image();
       const frameNum = i.toString().padStart(3, '0');
       img.src = `/assets/hero-frames/ezgif-frame-${frameNum}.jpg`;
       img.onload = () => {
-        loadedImages[i - 1] = img;
+        loadedHeroImages[i - 1] = img;
         handleAssetLoad();
       };
-      img.onerror = handleAssetLoad; // don't block load if frame fails
+      img.onerror = handleAssetLoad;
     }
 
-    imagesRef.current = loadedImages;
+    // Preload about-creator frames
+    for (let i = 1; i <= totalAboutFrames; i++) {
+      const img = new Image();
+      const frameNum = i.toString().padStart(3, '0');
+      img.src = `/assets/about-frames/ezgif-frame-${frameNum}.jpg`;
+      img.onload = () => {
+        loadedAboutImages[i - 1] = img;
+        handleAssetLoad();
+      };
+      img.onerror = handleAssetLoad;
+    }
+
+    imagesRef.current = loadedHeroImages;
+    aboutImagesRef.current = loadedAboutImages;
 
     // Preload other images
     otherAssets.forEach(src => {
@@ -260,6 +273,33 @@ export default function App() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const img = imagesRef.current[frameIndex - 1];
+    if (!img) return;
+
+    // Clear and draw centered image with cover behavior
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const imgRatio = img.width / img.height;
+    const canvasRatio = canvas.width / canvas.height;
+    let drawWidth = canvas.width;
+    let drawHeight = canvas.height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (imgRatio > canvasRatio) {
+      drawWidth = canvas.height * imgRatio;
+      offsetX = (canvas.width - drawWidth) / 2;
+    } else {
+      drawHeight = canvas.width / imgRatio;
+      offsetY = (canvas.height - drawHeight) / 2;
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  };
+
+  const drawAboutFrame = (frameIndex) => {
+    const canvas = aboutCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const img = aboutImagesRef.current[frameIndex - 1];
     if (!img) return;
 
     // Clear and draw centered image with cover behavior
@@ -370,10 +410,311 @@ export default function App() {
   }, [isLoading]);
 
   // ------------------------------------------------------------------------
+  // ABOUT CREATOR CANVAS DRAW & TIMELINE SCRUB
+  // ------------------------------------------------------------------------
+  useEffect(() => {
+    if (isLoading) return;
+
+    // Set initial canvas size
+    const canvas = aboutCanvasRef.current;
+    if (canvas) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawAboutFrame(1);
+    }
+
+    const handleResize = () => {
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        drawAboutFrame(aboutCurrentFrameRef.current);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
+    // GSAP Scroll Scrub Timeline for About Section
+    const frameObj = { frame: 1 };
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutContainerRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.15,
+        pin: true,
+        pinSpacing: false,
+      }
+    });
+
+    // Animate frames
+    tl.to(frameObj, {
+      frame: 241,
+      ease: 'none',
+      duration: 51.5,
+      onUpdate: () => {
+        const frameIndex = Math.round(frameObj.frame);
+        aboutCurrentFrameRef.current = frameIndex;
+        drawAboutFrame(frameIndex);
+      }
+    }, 0);
+
+    // Text Overlays Animations
+    const slideDuration = 3;
+    const holdDuration = 1.5;
+    const fadeDuration = 2;
+
+    // Slide 1: Creative Thinker
+    tl.fromTo('.about-overlay-1', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      0
+    );
+    tl.fromTo('.about-overlay-1 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      0
+    );
+    tl.to('.about-overlay-1', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      0 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-1 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      0 + fadeDuration + holdDuration
+    );
+
+    // Slide 2: Content Creator
+    const start2 = 4.5;
+    tl.fromTo('.about-overlay-2', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start2
+    );
+    tl.fromTo('.about-overlay-2 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start2
+    );
+    tl.to('.about-overlay-2', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start2 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-2 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start2 + fadeDuration + holdDuration
+    );
+
+    // Slide 3: Visual Storyteller
+    const start3 = 9;
+    tl.fromTo('.about-overlay-3', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start3
+    );
+    tl.fromTo('.about-overlay-3 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start3
+    );
+    tl.to('.about-overlay-3', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start3 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-3 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start3 + fadeDuration + holdDuration
+    );
+
+    // Slide 4: AI Web Designer
+    const start4 = 13.5;
+    tl.fromTo('.about-overlay-4', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start4
+    );
+    tl.fromTo('.about-overlay-4 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start4
+    );
+    tl.to('.about-overlay-4', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start4 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-4 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start4 + fadeDuration + holdDuration
+    );
+
+    // Slide 5: Backend Engineer
+    const start5 = 18;
+    tl.fromTo('.about-overlay-5', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start5
+    );
+    tl.fromTo('.about-overlay-5 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start5
+    );
+    tl.to('.about-overlay-5', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start5 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-5 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start5 + fadeDuration + holdDuration
+    );
+
+    // Slide 6: Model
+    const start6 = 22.5;
+    tl.fromTo('.about-overlay-6', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start6
+    );
+    tl.fromTo('.about-overlay-6 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start6
+    );
+    tl.to('.about-overlay-6', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start6 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-6 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start6 + fadeDuration + holdDuration
+    );
+
+    // Slide 7: Creative Strategist
+    const start7 = 27;
+    tl.fromTo('.about-overlay-7', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start7
+    );
+    tl.fromTo('.about-overlay-7 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start7
+    );
+    tl.to('.about-overlay-7', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start7 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-7 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start7 + fadeDuration + holdDuration
+    );
+
+    // Slide 8: Social Media Marketer
+    const start8 = 31.5;
+    tl.fromTo('.about-overlay-8', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start8
+    );
+    tl.fromTo('.about-overlay-8 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start8
+    );
+    tl.to('.about-overlay-8', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start8 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-8 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start8 + fadeDuration + holdDuration
+    );
+
+    // Slide 9: Audience Psychology Enthusiast
+    const start9 = 36;
+    tl.fromTo('.about-overlay-9', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start9
+    );
+    tl.fromTo('.about-overlay-9 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start9
+    );
+    tl.to('.about-overlay-9', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start9 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-9 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start9 + fadeDuration + holdDuration
+    );
+
+    // Slide 10: Problem Solver
+    const start10 = 40.5;
+    tl.fromTo('.about-overlay-10', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start10
+    );
+    tl.fromTo('.about-overlay-10 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start10
+    );
+    tl.to('.about-overlay-10', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start10 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-10 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start10 + fadeDuration + holdDuration
+    );
+
+    // Slide 11: Always Learning.
+    const start11 = 45;
+    tl.fromTo('.about-overlay-11', 
+      { opacity: 0, scale: 0.95, filter: 'blur(10px)' }, 
+      { opacity: 1, scale: 1, filter: 'blur(0px)', duration: fadeDuration, ease: 'power2.out' }, 
+      start11
+    );
+    tl.fromTo('.about-overlay-11 .about-title',
+      { yPercent: 100 },
+      { yPercent: 0, duration: slideDuration, ease: 'power3.out' },
+      start11
+    );
+    tl.to('.about-overlay-11', 
+      { opacity: 0, scale: 1.05, filter: 'blur(10px)', duration: fadeDuration, ease: 'power2.in' }, 
+      start11 + fadeDuration + holdDuration
+    );
+    tl.to('.about-overlay-11 .about-title',
+      { yPercent: -100, duration: slideDuration, ease: 'power3.in' },
+      start11 + fadeDuration + holdDuration
+    );
+
+    // Transition overlay fade-in (darken screen)
+    tl.to('.about-canvas-overlay', {
+      opacity: 1,
+      duration: 3,
+      ease: 'power1.inOut'
+    }, 48.5);
+
+    // Clean up
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
+  }, [isLoading]);
+
+  // ------------------------------------------------------------------------
   // INTERVIEW TIMELINE / SCROLL ANIMATIONS FOR OTHER SECTIONS
   // ------------------------------------------------------------------------
   useEffect(() => {
     if (isLoading) return;
+
+    const heroContainer = heroContainerRef.current;
+    const aboutContainer = aboutContainerRef.current;
 
     // Timeline card entries
     gsap.utils.toArray('.timeline-card').forEach((card) => {
@@ -413,7 +754,7 @@ export default function App() {
 
     return () => {
       ScrollTrigger.getAll().forEach(t => {
-        if (t.trigger !== heroContainerRef.current) t.kill();
+        if (t.trigger !== heroContainer && t.trigger !== aboutContainer) t.kill();
       });
     };
   }, [isLoading]);
@@ -535,6 +876,112 @@ export default function App() {
           <p className="intro-bio">
             Bridging cinematic visual arts, B.Tech computer science insights, and cutting-edge artificial intelligence platforms to tell compelling, premium brand stories.
           </p>
+        </div>
+      </section>
+
+      {/* ==========================================
+          cinematic scroll-driven about creator section
+          ========================================== */}
+      <section 
+        className="about-scroll-container" 
+        ref={aboutContainerRef}
+        id="about-creator"
+      >
+        <div className="about-sticky-wrapper">
+          <canvas className="about-canvas" ref={aboutCanvasRef} id="about-canvas" />
+          <div className="about-canvas-overlay"></div>
+          
+          <div className="about-overlay">
+            
+            {/* Slide 1: Creative Thinker */}
+            <div className="about-text-block about-overlay-1">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Creative Thinker</h2>
+              </div>
+              <p className="about-subtitle">Conceptualizing ideas from first principles.</p>
+            </div>
+
+            {/* Slide 2: Content Creator */}
+            <div className="about-text-block about-overlay-2">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Content Creator</h2>
+              </div>
+              <p className="about-subtitle">Creating videos that people remember.</p>
+            </div>
+
+            {/* Slide 3: Visual Storyteller */}
+            <div className="about-text-block about-overlay-3">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Visual Storyteller</h2>
+              </div>
+              <p className="about-subtitle">Every frame should make people feel something.</p>
+            </div>
+
+            {/* Slide 4: AI Web Designer */}
+            <div className="about-text-block about-overlay-4">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">AI Web Designer</h2>
+              </div>
+              <p className="about-subtitle">Turning imagination into premium digital experiences.</p>
+            </div>
+
+            {/* Slide 5: Backend Engineer */}
+            <div className="about-text-block about-overlay-5">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Backend Engineer</h2>
+              </div>
+              <p className="about-subtitle">Building the logic behind beautiful interfaces.</p>
+            </div>
+
+            {/* Slide 6: Model */}
+            <div className="about-text-block about-overlay-6">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Model</h2>
+              </div>
+              <p className="about-subtitle">Expressing stories without speaking.</p>
+            </div>
+
+            {/* Slide 7: Creative Strategist */}
+            <div className="about-text-block about-overlay-7">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Creative Strategist</h2>
+              </div>
+              <p className="about-subtitle">Creativity without strategy is just decoration.</p>
+            </div>
+
+            {/* Slide 8: Social Media Marketer */}
+            <div className="about-text-block about-overlay-8">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Social Media Marketer</h2>
+              </div>
+              <p className="about-subtitle">Designing content that earns attention.</p>
+            </div>
+
+            {/* Slide 9: Audience Psychology Enthusiast */}
+            <div className="about-text-block about-overlay-9">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 4.5rem)' }}>Audience Psychology Enthusiast</h2>
+              </div>
+              <p className="about-subtitle">Understanding why people stop scrolling.</p>
+            </div>
+
+            {/* Slide 10: Problem Solver */}
+            <div className="about-text-block about-overlay-10">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title">Problem Solver</h2>
+              </div>
+              <p className="about-subtitle">Resolving complex technical and design challenges.</p>
+            </div>
+
+            {/* Slide 11: Always Learning. */}
+            <div className="about-text-block about-overlay-11">
+              <div className="mask-reveal-wrapper">
+                <h2 className="about-title editorial-italic" style={{ textTransform: 'none' }}>Always Learning.</h2>
+              </div>
+              <p className="about-subtitle">Every project teaches something new.</p>
+            </div>
+
+          </div>
         </div>
       </section>
 
