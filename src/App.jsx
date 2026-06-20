@@ -10,7 +10,9 @@ import {
   Sparkles,
   Smartphone,
   Video,
-  Monitor
+  Monitor,
+  Volume2,
+  VolumeX
 } from 'lucide-react'
 
 // Register GSAP ScrollTrigger plugin
@@ -30,6 +32,9 @@ export default function App() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
+  // Campaigns Mute State
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
+  
   // Refs for Scroll elements
   const canvasRef = useRef(null);
   const heroContainerRef = useRef(null);
@@ -41,6 +46,9 @@ export default function App() {
   const aboutContainerRef = useRef(null);
   const aboutImagesRef = useRef([]);
   const aboutCurrentFrameRef = useRef(1);
+
+  // Refs for Campaigns Video
+  const campaignVideoRef = useRef(null);
 
   // ------------------------------------------------------------------------
   // PROJECT DATASET
@@ -64,10 +72,10 @@ export default function App() {
       category: 'Visual Storytelling',
       tagline: 'Luxury fragrance advertisement centered on reflections, geometry, and fluid elegance.',
       cover: '/assets/images/saree-ad.png', // Fallback or poster cover
-      videoUrl: '/assets/videos/perfume.mov',
-      role: 'Director of Photography & Editor',
-      tools: 'Blender 3D, DaVinci Resolve, Sony FX3',
-      process: 'Engineered high-end lighting reflections and simulated bottle physics. We focused on extreme high-contrast lighting to capture shadows, emphasizing luxury editorial branding.',
+      videoUrl: '/assets/videos/perfume (1).mp4',
+      role: 'Concept, Direction, Cinematography & Editing',
+      tools: 'DaVinci Resolve, Sony FX3, VN Editor',
+      process: 'Conceptualized, shot, and directed a premium fragrance commercial sequence. Established high-contrast geometry and lighting. Edited and paced the visuals to produce a sensory luxury advertising presentation.',
       output: 'Brand launch campaign video.'
     },
     {
@@ -109,27 +117,33 @@ export default function App() {
     {
       id: 'ai-ad-1',
       title: 'Cybernetic Oasis',
-      category: 'AI-Generated Advertisements',
+      category: 'AI Advertisement',
       tagline: 'Generative biotechnology advertisement showcasing futuristic organic structures.',
       cover: '/assets/hero-frames/ezgif-frame-140.jpg',
       videoUrl: '/assets/videos/ai-ad-1.mp4',
-      role: 'AI Creator & Editor',
-      tools: 'Google Flow, Gemini, ChatGPT, ElevenLabs AI',
-      process: 'Developed advanced generative pipelines to synthesize bio-chrome mechanical structures. Orchestrated text-to-video prompt engineering with custom direction and script overlays.',
-      prompt: 'hyper-realistic cinematic close-up of bioluminescent orchid blooming inside a futuristic chrome lab, neon teal accents, 8k resolution, raytracing --ar 16:9',
+      role: 'Creative Director',
+      tools: 'Google Flow, Gemini, ChatGPT, Midjourney, ElevenLabs, Runway',
+      process: 'Conceptualized a futuristic advertising framework for luxury bio-cosmetics. Designed the visual identity to merge bioluminescent botanical structures with high-end chrome elements. Managed the creative direction, script scripting, voice generation, and sensory grading pipelines to achieve a premium commercial presentation.',
+      overview: 'A commercial concept exploring the intersection of biotechnology and high-fashion luxury. The campaign highlights organic plant structures merged with hyper-polished metallic chrome, establishing a futuristic brand identity for next-generation cosmetics.',
+      roles: ['Creative Direction', 'Art Direction', 'Visual Storytelling', 'AI Advertisement', 'Concept Development'],
+      industry: 'Cosmetics & Biotech',
+      year: '2025',
       output: 'Future-facing AI advertising concept.'
     },
     {
       id: 'ai-ad-2',
       title: 'Neo-Tokyo Horizons',
-      category: 'AI-Generated Advertisements',
+      category: 'AI Advertisement',
       tagline: 'Futuristic automotive showcase mapping light trails and wet asphalt reflections.',
       cover: '/assets/hero-frames/ezgif-frame-180.jpg',
       videoUrl: '/assets/videos/ai-ad-2.mp4',
-      role: 'AI Creator & Sound Designer',
-      tools: 'Google Flow, Gemini, ChatGPT, ElevenLabs AI',
-      process: 'Simulated a high-speed sports car driving through wet cyberpunk streets using generative loops and neural audio synthesis.',
-      prompt: 'sleek sports car cruising through dark wet neon-lit Tokyo streets, cinematic lighting, heavy rain reflections, A24 aesthetic, photorealistic --ar 16:9',
+      role: 'Creative Director & Editor',
+      tools: 'Google Flow, Gemini, ChatGPT, Flux, ElevenLabs, Sora',
+      process: 'Directed a cinematic automotive commercial sequence exploring nighttime reflections and speed kinetics. Established a mood-board centered on wet asphalt reflections and light dynamics. Edited the sound design and synchronized pacing to create an engaging brand campaign.',
+      overview: 'A high-octane automotive campaign exploring nighttime aesthetics and cyberpunk street design. Focused on reflections of wet asphalt, neon light trails, and sensory editing rhythms to evoke luxury performance and modern consumer psychology.',
+      roles: ['Creative Direction', 'Art Direction', 'Visual Storytelling', 'AI Advertisement', 'Creative Strategy'],
+      industry: 'Automotive & Luxury',
+      year: '2025',
       output: 'AI campaign reel.'
     }
   ];
@@ -175,6 +189,11 @@ export default function App() {
     const otherAssets = [
       '/assets/images/saree-ad.png',
       '/assets/images/jewellery-ad.png',
+      '/assets/images/campaign-1.jpg',
+      '/assets/images/campaign-2.jpg',
+      '/assets/images/campaign-3.jpg',
+      '/assets/images/campaign-4.jpg',
+      '/assets/images/campaign-5.jpg',
     ];
     
     const totalAssets = totalHeroFrames + totalAboutFrames + otherAssets.length;
@@ -752,10 +771,252 @@ export default function App() {
       );
     });
 
+    // AI project cards reveal
+    gsap.utils.toArray('.ai-card').forEach((card) => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.0,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+
+      const tags = card.querySelectorAll('.ai-role-tag');
+      if (tags.length > 0) {
+        gsap.fromTo(tags,
+          { opacity: 0, scale: 0.8, y: 10 },
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.05,
+            ease: 'back.out(1.5)',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 80%',
+              toggleActions: 'play none none none'
+            }
+          }
+        );
+      }
+    });
+
     return () => {
       ScrollTrigger.getAll().forEach(t => {
-        if (t.trigger !== heroContainer && t.trigger !== aboutContainer) t.kill();
+        if (
+          t.trigger !== heroContainer && 
+          t.trigger !== aboutContainer && 
+          t.trigger !== '#campaigns' &&
+          t.trigger !== '.campaign-hero-container' &&
+          t.trigger !== '.campaign-video-container' &&
+          t.trigger !== '.campaign-editorial-grid' &&
+          t.trigger !== '.campaign-roles-grid' &&
+          t.trigger !== '.campaign-large-editorial-container' &&
+          t.trigger !== '.campaign-final-container'
+        ) t.kill();
       });
+    };
+  }, [isLoading]);
+
+  // ------------------------------------------------------------------------
+  // CAMPAIGNS SCROLL ANIMATIONS
+  // ------------------------------------------------------------------------
+  useEffect(() => {
+    if (isLoading) return;
+
+    // Body background color shift
+    const bgTrigger = ScrollTrigger.create({
+      trigger: '#campaigns',
+      start: 'top 80%',
+      end: 'bottom 20%',
+      onEnter: () => gsap.to('body', { backgroundColor: '#0c0a06', duration: 0.8 }),
+      onLeave: () => gsap.to('body', { backgroundColor: '#050505', duration: 0.8 }),
+      onEnterBack: () => gsap.to('body', { backgroundColor: '#0c0a06', duration: 0.8 }),
+      onLeaveBack: () => gsap.to('body', { backgroundColor: '#050505', duration: 0.8 }),
+    });
+
+    // Campaign Hero Image Parallax (campaign-1)
+    const heroParallax = gsap.fromTo('.campaign-hero-img', 
+      { yPercent: -12, scale: 1.08 },
+      {
+        yPercent: 12,
+        scale: 1.0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.campaign-hero-container',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
+    // Text reveals
+    const textReveals = [];
+    gsap.utils.toArray('.campaign-reveal-text').forEach((text) => {
+      const anim = gsap.fromTo(text,
+        { opacity: 0, y: 40, filter: 'blur(4px)' },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 1.0,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: text,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+      textReveals.push(anim);
+    });
+
+    // Video zoom scroll effect
+    const videoZoom = gsap.fromTo('.campaign-video-container',
+      { scale: 0.94 },
+      {
+        scale: 1.0,
+        ease: 'power1.out',
+        scrollTrigger: {
+          trigger: '.campaign-video-presentation',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 0.5
+        }
+      }
+    );
+
+    // Video viewport play/pause trigger
+    const videoElement = campaignVideoRef.current;
+    let videoTrigger = null;
+    if (videoElement) {
+      const playVideo = () => {
+        videoElement.play().catch(() => {});
+      };
+      const pauseVideo = () => {
+        videoElement.pause();
+      };
+      videoTrigger = ScrollTrigger.create({
+        trigger: '.campaign-video-container',
+        start: 'top bottom',
+        end: 'bottom top',
+        onEnter: playVideo,
+        onLeave: pauseVideo,
+        onEnterBack: playVideo,
+        onLeaveBack: pauseVideo,
+      });
+    }
+
+    // Overlapping editorial cards parallax (campaign-2 & campaign-3)
+    const leftCardParallax = gsap.fromTo('.campaign-card-left',
+      { yPercent: 4 },
+      {
+        yPercent: -8,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.campaign-editorial-grid',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
+    const rightCardParallax = gsap.fromTo('.campaign-card-right',
+      { yPercent: -4 },
+      {
+        yPercent: 8,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.campaign-editorial-grid',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
+    // Staggered chips fade in
+    const chipsAnim = gsap.fromTo('.campaign-chip',
+      { opacity: 0, scale: 0.8, y: 15 },
+      {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.04,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.campaign-roles-grid',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
+
+    // Large editorial parallax (campaign-4)
+    const largeEditorialParallax = gsap.fromTo('.campaign-large-editorial-img',
+      { yPercent: -12 },
+      {
+        yPercent: 12,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.campaign-large-editorial-container',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
+    // Final image reveal/parallax (campaign-5)
+    const finalParallax = gsap.fromTo('.campaign-final-img',
+      { scale: 1.08 },
+      {
+        scale: 1.0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.campaign-final-container',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+
+    return () => {
+      bgTrigger.kill();
+      heroParallax.scrollTrigger?.kill();
+      heroParallax.kill();
+      textReveals.forEach(anim => {
+        anim.scrollTrigger?.kill();
+        anim.kill();
+      });
+      videoZoom.scrollTrigger?.kill();
+      videoZoom.kill();
+      if (videoTrigger) {
+        videoTrigger.kill();
+      }
+      leftCardParallax.scrollTrigger?.kill();
+      leftCardParallax.kill();
+      rightCardParallax.scrollTrigger?.kill();
+      rightCardParallax.kill();
+      chipsAnim.scrollTrigger?.kill();
+      chipsAnim.kill();
+      largeEditorialParallax.scrollTrigger?.kill();
+      largeEditorialParallax.kill();
+      finalParallax.scrollTrigger?.kill();
+      finalParallax.kill();
+      gsap.to('body', { backgroundColor: '#050505', duration: 0.2 }); // Reset body color on unmount
     };
   }, [isLoading]);
 
@@ -774,6 +1035,13 @@ export default function App() {
     if (video) {
       video.pause();
       video.currentTime = 0;
+    }
+  };
+
+  const toggleMute = () => {
+    if (campaignVideoRef.current) {
+      campaignVideoRef.current.muted = !campaignVideoRef.current.muted;
+      setIsVideoMuted(campaignVideoRef.current.muted);
     }
   };
 
@@ -811,6 +1079,7 @@ export default function App() {
       <nav className="nav-bar" id="navbar">
         <a href="#" className="nav-logo">DAKSH MEHTA</a>
         <ul className="nav-links">
+          <li><a href="#campaigns">Campaigns</a></li>
           <li><a href="#work">Work</a></li>
           <li><a href="#ai">AI Work</a></li>
           <li><a href="#presentations">Presentations</a></li>
@@ -986,6 +1255,208 @@ export default function App() {
       </section>
 
       {/* ==========================================
+          MODEL + CREATOR SHOWCASE SECTION (Featured Campaigns)
+          ========================================== */}
+      <section className="campaigns-section" id="campaigns">
+        <div className="container">
+          
+          <div className="section-header">
+            <span className="section-label">Editorial Campaign</span>
+            <h2 className="section-title">Creative Direction <span className="editorial-italic">×</span> Modeling</h2>
+          </div>
+
+          {/* 1. Large Hero Fashion Image */}
+          <div className="campaign-hero-container">
+            <div className="campaign-hero-img-wrap">
+              <img 
+                src="/assets/images/campaign-1.jpg" 
+                alt="Daksh Mehta Editorial Campaign" 
+                className="campaign-hero-img" 
+              />
+              <div className="campaign-img-overlay"></div>
+            </div>
+            <div className="campaign-hero-caption">
+              <span className="caption-num">01 / CONCEPT</span>
+              <h3 className="caption-title">In Front of the Camera</h3>
+            </div>
+          </div>
+
+          {/* 2. Text Statement */}
+          <div className="campaign-statement-container">
+            <p className="campaign-reveal-text statement-serif">
+              Fashion isn't just clothing.
+            </p>
+            <p className="campaign-reveal-text statement-serif highlighted-text">
+              It's visual communication.
+            </p>
+            <p className="campaign-reveal-text statement-body">
+              Every outfit tells a story before words do. An advertising concept exploring how thoughtful styling influences first impressions and captures human attention.
+            </p>
+          </div>
+
+          {/* 3. Video Showcase (Apple Presentation Style) */}
+          <div className="campaign-video-presentation">
+            <div className="campaign-reveal-text video-header">
+              <span className="section-label">INTERNSHIP ASSIGNMENT</span>
+              <h3 className="campaign-video-title">Pairing Shirts With The Perfect Trousers</h3>
+            </div>
+
+            <div className="campaign-video-container" onClick={toggleMute}>
+              <video 
+                ref={campaignVideoRef}
+                src="/assets/videos/outfit Ad assignment.mp4" 
+                className="campaign-video" 
+                muted 
+                loop 
+                playsInline
+                preload="auto"
+              />
+              
+              <div className="video-overlay-details">
+                <div className="video-badge">PREVIEW CAMPAIGN</div>
+                <div className="video-control-pill">
+                  {isVideoMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                  <span>{isVideoMuted ? "Click to Unmute" : "Muted"}</span>
+                </div>
+              </div>
+              
+              <div className="video-hover-ui">
+                <div className="hover-circle">
+                  {isVideoMuted ? <Volume2 size={24} /> : <VolumeX size={24} />}
+                </div>
+              </div>
+            </div>
+
+            <div className="campaign-video-credits">
+              <div className="credit-item campaign-reveal-text">
+                <span className="credit-label">CONCEPT</span>
+                <span className="credit-value">Daksh Mehta</span>
+              </div>
+              <div className="credit-item campaign-reveal-text">
+                <span className="credit-label">DIRECTION</span>
+                <span className="credit-value">Daksh Mehta</span>
+              </div>
+              <div className="credit-item campaign-reveal-text">
+                <span className="credit-label">PERFORMANCE</span>
+                <span className="credit-value">Daksh Mehta</span>
+              </div>
+              <div className="credit-item campaign-reveal-text">
+                <span className="credit-label">EDITING</span>
+                <span className="credit-value">Daksh Mehta</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Two Images (Overlapping Editorial Composition) */}
+          <div className="campaign-editorial-grid">
+            <div className="campaign-card campaign-card-left">
+              <div className="campaign-img-wrapper">
+                <img 
+                  src="/assets/images/campaign-2.jpg" 
+                  alt="Fashion Portrait Rooftop" 
+                  className="campaign-grid-img" 
+                />
+              </div>
+              <div className="campaign-card-meta">
+                <span className="caption-num">02 / LIFESTYLE</span>
+                <span className="caption-desc">Urban Expression</span>
+              </div>
+            </div>
+
+            <div className="campaign-card campaign-card-right">
+              <div className="campaign-img-wrapper">
+                <img 
+                  src="/assets/images/campaign-3.jpg" 
+                  alt="Editorial Portrait Palace Garden" 
+                  className="campaign-grid-img" 
+                />
+              </div>
+              <div className="campaign-card-meta">
+                <span className="caption-num">03 / PORTRAIT</span>
+                <span className="caption-desc">Palace Symmetry</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Highlight My Roles / Animated Chips */}
+          <div className="campaign-roles-section">
+            <div className="campaign-reveal-text roles-header">
+              <span className="section-label">THE CREATIVE IDENTITY</span>
+              <h3 className="roles-title">COHESIVE CAPABILITIES</h3>
+              <p className="roles-subtitle">
+                Bridging modeling, fashion styling, creative direction, and technical execution into a unified brand capability.
+              </p>
+            </div>
+
+            <div className="campaign-roles-grid">
+              {[
+                "Creative Direction",
+                "Fashion Styling",
+                "Advertising",
+                "Visual Storytelling",
+                "Content Creation",
+                "Video Editing",
+                "Modeling",
+                "Brand Communication",
+                "Creative Strategy",
+                "Audience Psychology",
+                "Social Media Marketing",
+                "AI-Assisted Design"
+              ].map((role, idx) => (
+                <div className="campaign-chip" key={idx}>
+                  <Sparkles size={12} className="chip-icon" />
+                  <span>{role}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. Large Editorial Image (Campaign 4) */}
+          <div className="campaign-large-editorial-container">
+            <div className="campaign-large-editorial-wrap">
+              <img 
+                src="/assets/images/campaign-4.jpg" 
+                alt="Large Editorial Portrait" 
+                className="campaign-large-editorial-img" 
+              />
+              <div className="campaign-img-overlay"></div>
+            </div>
+            <div className="campaign-large-editorial-caption">
+              <span className="caption-num">04 / EDITORIAL</span>
+              <h4 className="caption-title">Classic Sophistication</h4>
+            </div>
+          </div>
+
+          {/* 7. Moving Text (Marquee) */}
+          <div className="campaign-marquee-container">
+            <div className="campaign-marquee-track">
+              <div className="campaign-marquee-content">
+                <span>CREATIVE DIRECTION × FASHION STYLING × ADVERTISING × VISUAL STORYTELLING × MODELING × BRAND COMMUNICATION × </span>
+                <span>CREATIVE DIRECTION × FASHION STYLING × ADVERTISING × VISUAL STORYTELLING × MODELING × BRAND COMMUNICATION × </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 8. Final Campaign Image (Campaign 5) */}
+          <div className="campaign-final-container">
+            <div className="campaign-final-wrap">
+              <img 
+                src="/assets/images/campaign-5.jpg" 
+                alt="Final Editorial Image" 
+                className="campaign-final-img" 
+              />
+              <div className="campaign-img-overlay"></div>
+            </div>
+            <div className="campaign-final-caption">
+              <span className="caption-num">05 / SYNTHESIS</span>
+              <h4 className="caption-title">Pairing Outfits and Ideas</h4>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ==========================================
           featured work section (case study style)
           ========================================== */}
       <section className="section" id="work">
@@ -1080,7 +1551,7 @@ export default function App() {
           </div>
 
           <div className="ai-grid">
-            {projects.filter(p => p.category.includes('AI-Generated')).map((aiProj) => (
+            {projects.filter(p => p.category.includes('AI Advertisement')).map((aiProj) => (
               <div className="ai-card" key={aiProj.id} id={`ai-card-${aiProj.id}`}>
                 <div 
                   className="ai-video-wrapper" 
@@ -1097,15 +1568,41 @@ export default function App() {
                 </div>
                 <div className="ai-card-info">
                   <h3 className="ai-concept-title">{aiProj.title}</h3>
-                  <div className="ai-workflow">
-                    <span className="ai-label">Prompt Engineering</span>
-                    <div className="ai-prompt">"{aiProj.prompt}"</div>
+                  
+                  <div className="ai-details-panel">
+                    <div className="ai-project-overview">
+                      <span className="ai-label">Project Overview</span>
+                      <p className="ai-overview-text">{aiProj.overview}</p>
+                    </div>
+
+                    <div className="ai-roles-tags">
+                      <span className="ai-label">Key Roles</span>
+                      <div className="ai-tags-container">
+                        {aiProj.roles.map((tag) => (
+                          <span className="ai-role-tag" key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="ai-metadata-row">
+                      <div className="ai-metadata-item">
+                        <span className="ai-meta-label">Industry</span>
+                        <span className="ai-meta-val">{aiProj.industry}</span>
+                      </div>
+                      <div className="ai-metadata-item">
+                        <span className="ai-meta-label">Year</span>
+                        <span className="ai-meta-val">{aiProj.year}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="ai-meta-pills">
-                    {aiProj.tools.split(', ').map((tool) => (
-                      <span className="ai-pill" key={tool}>{tool}</span>
-                    ))}
-                    <span className="ai-pill" style={{ borderColor: 'var(--accent-blue)', color: '#fff' }}>Gen AI</span>
+
+                  <div className="ai-tools-used">
+                    <div className="ai-meta-pills">
+                      {aiProj.tools.split(', ').map((tool) => (
+                        <span className="ai-pill" key={tool}>{tool}</span>
+                      ))}
+                      <span className="ai-pill ai-highlight-pill">{aiProj.category}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1522,10 +2019,24 @@ export default function App() {
                   <p>{activeProject.process}</p>
                 </div>
                 
-                {activeProject.prompt && (
-                  <div className="ai-workflow" style={{ alignSelf: 'start' }}>
-                    <span className="ai-label">Concept Prompt</span>
-                    <p className="ai-prompt">"{activeProject.prompt}"</p>
+                {activeProject.overview && (
+                  <div className="case-study-overview-section" style={{ alignSelf: 'start', display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
+                    <div>
+                      <span className="meta-label">Project Overview</span>
+                      <p style={{ marginTop: '0.5rem', fontSize: '1.05rem', lineHeight: '1.7', color: 'var(--text-secondary)' }}>{activeProject.overview}</p>
+                    </div>
+                    {activeProject.industry && (
+                      <div style={{ display: 'flex', gap: '2.5rem', marginTop: '0.25rem' }}>
+                        <div>
+                          <span className="meta-label">Industry</span>
+                          <span style={{ display: 'block', fontSize: '0.95rem', color: 'var(--text-primary)', marginTop: '0.25rem' }}>{activeProject.industry}</span>
+                        </div>
+                        <div>
+                          <span className="meta-label">Year</span>
+                          <span style={{ display: 'block', fontSize: '0.95rem', color: 'var(--text-primary)', marginTop: '0.25rem' }}>{activeProject.year}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
